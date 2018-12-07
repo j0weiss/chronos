@@ -12,10 +12,25 @@
   <div id="timer"></div>
   <button id="start-timer">Start</button>
   <button id="stop-timer">Stop</button>
+  <button id="increase-timer">+ 15s</button>
+  <button id="decrease-timer">- 15s</button>
 </section>
 <script>
-const REMAINING_MILLISECONDS = 3*60*1000;
+let timerMilliseconds = 3*60*1000;
 let timer = null;
+
+function increaseTimer() {
+  adjustTimer(15000);
+}
+
+function decreaseTimer() {
+  adjustTimer(-15000);
+}
+
+function adjustTimer(adjustmentInMilliseconds) {
+  timerMilliseconds = timerMilliseconds + adjustmentInMilliseconds;
+  renderRemainingTime(timerMilliseconds);
+}
 
 function startTimer() {
   if (timer === null) {
@@ -48,6 +63,8 @@ function renderRemainingTime(milliseconds) {
 function registerEvents() {
   document.querySelector('#start-timer').addEventListener('click', startTimer);
   document.querySelector('#stop-timer').addEventListener('click', stopTimer);
+  document.querySelector('#increase-timer').addEventListener('click', increaseTimer);
+  document.querySelector('#decrease-timer').addEventListener('click', decreaseTimer);
 }
 
 window.addEventListener('load', () => {
