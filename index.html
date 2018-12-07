@@ -17,90 +17,90 @@
   <button id="decrease-timer">- 15s</button>
 </section>
 <script>
-const defaultTimerSeconds = 3*60;
-let timerSeconds = defaultTimerSeconds;
-let timer = null;
+  const defaultTimerSeconds = 3 * 60;
+  let timerSeconds = defaultTimerSeconds;
+  let timer = null;
 
-function increaseTimer() {
-  adjustTimer(15);
-}
-
-function decreaseTimer() {
-  adjustTimer(-15);
-}
-
-function adjustTimer(adjustmentInSeconds) {
-  if (timer) {
-    pauseTimer();
+  function increaseTimer() {
+    adjustTimer(15);
   }
 
-  timerSeconds = timerSeconds + adjustmentInSeconds;
-  renderRemainingTime(timerSeconds);
-
-  if (timer) {
-    timer = null;
-    startTimer();
+  function decreaseTimer() {
+    adjustTimer(-15);
   }
-}
 
-function startTimer() {
-  if (!timer) {
-    const end = Date.now() + timerSeconds * 1000;
-    timer = setInterval(countdown, 1000, end);
+  function adjustTimer(adjustmentInSeconds) {
+    if (timer) {
+      pauseTimer();
+    }
+
+    timerSeconds = timerSeconds + adjustmentInSeconds;
+    renderRemainingTime(timerSeconds);
+
+    if (timer) {
+      timer = null;
+      startTimer();
+    }
+  }
+
+  function startTimer() {
+    if (!timer) {
+      const end = Date.now() + timerSeconds * 1000;
+      timer = setInterval(countdown, 1000, end);
+      renderRemainingTime(timerSeconds);
+    }
+  }
+
+  function pauseTimer() {
+    if (timer) {
+      clearInterval(timer);
+    }
+  }
+
+  function stopTimer() {
+    if (timer) {
+      clearInterval(timer);
+      timer = null;
+      timerSeconds = defaultTimerSeconds;
+      renderRemainingTime(timerSeconds);
+    }
+  }
+
+  function countdown(endTimePoint) {
+    const now = Date.now();
+    timerSeconds = (endTimePoint - now) / 1000;
+
+    if (timerSeconds <= 0) {
+      clearInterval(timer);
+      timer = null;
+      timerSeconds = 0;
+    }
+
     renderRemainingTime(timerSeconds);
   }
-}
 
-function pauseTimer() {
-  if (timer) {
-    clearInterval(timer);
+  function renderRemainingTime(remainingSeconds) {
+    const minutes = Math.floor(remainingSeconds / 60);
+    const seconds = Math.ceil(remainingSeconds % 60) % 60;
+
+    const minutesString = minutes < 10 ? '0' + minutes : minutes;
+    const secondsString = seconds < 10 ? '0' + seconds : seconds;
+
+    document.querySelector('#timer').innerHTML = minutesString + ':' + secondsString;
   }
-}
 
-function stopTimer() {
-  if (timer) {
-    clearInterval(timer);
-    timer = null;
-    timerSeconds = defaultTimerSeconds;
+  function registerEvents() {
+    document.querySelector('#start-timer').addEventListener('click', startTimer);
+    document.querySelector('#pause-timer').addEventListener('click', pauseTimer);
+    document.querySelector('#stop-timer').addEventListener('click', stopTimer);
+    document.querySelector('#increase-timer').addEventListener('click', increaseTimer);
+    document.querySelector('#decrease-timer').addEventListener('click', decreaseTimer);
+  }
+
+  window.addEventListener('load', () => {
+    registerEvents();
     renderRemainingTime(timerSeconds);
-  }
-}
-
-function countdown(endTimePoint) {
-  const now = Date.now();
-  timerSeconds = ( endTimePoint - now ) / 1000;
-
-  if (timerSeconds <= 0) {
-    clearInterval(timer);
-    timer = null;
-    timerSeconds = 0;
-  }
-
-  renderRemainingTime(timerSeconds);
-}
-
-function renderRemainingTime(remainingSeconds) {
-  const minutes = Math.floor( remainingSeconds / 60);
-  const seconds = Math.ceil( remainingSeconds % 60) % 60;
-
-  const minutesString = minutes < 10 ? '0' + minutes : minutes;
-  const secondsString = seconds < 10 ? '0' + seconds : seconds;
-
-  document.querySelector('#timer').innerHTML = minutesString + ':' + secondsString;
-}
-
-function registerEvents() {
-  document.querySelector('#start-timer').addEventListener('click', startTimer);
-  document.querySelector('#pause-timer').addEventListener('click', pauseTimer);
-  document.querySelector('#stop-timer').addEventListener('click', stopTimer);
-  document.querySelector('#increase-timer').addEventListener('click', increaseTimer);
-  document.querySelector('#decrease-timer').addEventListener('click', decreaseTimer);
-}
-
-window.addEventListener('load', () => {
-  registerEvents();
-  renderRemainingTime(timerSeconds);
-});
+  });
 </script>
 </body>
 </html>
