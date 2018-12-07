@@ -11,6 +11,7 @@
 <section>
   <div id="timer"></div>
   <button id="start-timer">Start</button>
+  <button id="pause-timer">Pause</button>
   <button id="stop-timer">Stop</button>
   <button id="increase-timer">+ 15s</button>
   <button id="decrease-timer">- 15s</button>
@@ -41,11 +42,20 @@ function startTimer() {
   }
 }
 
+function pauseTimer() {
+  if (timer) {
+    clearInterval(timer);
+    timer = null;
+  }
+}
+
 function stopTimer() {
-  clearInterval(timer);
-  timer = null;
-  timerMilliseconds = defaultTimerMilliseconds;
-  renderRemainingTime(timerMilliseconds);
+  if (timer) {
+    clearInterval(timer);
+    timer = null;
+    timerMilliseconds = defaultTimerMilliseconds;
+    renderRemainingTime(timerMilliseconds);
+  }
 }
 
 function countdown(endTimePoint) {
@@ -67,6 +77,7 @@ function renderRemainingTime(milliseconds) {
 
 function registerEvents() {
   document.querySelector('#start-timer').addEventListener('click', startTimer);
+  document.querySelector('#pause-timer').addEventListener('click', pauseTimer);
   document.querySelector('#stop-timer').addEventListener('click', stopTimer);
   document.querySelector('#increase-timer').addEventListener('click', increaseTimer);
   document.querySelector('#decrease-timer').addEventListener('click', decreaseTimer);
