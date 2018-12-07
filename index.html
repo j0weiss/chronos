@@ -28,16 +28,24 @@
     <button id="increase-rest-time" class="time-adjustment">+ 5s</button>
     <button id="decrease-rest-time" class="time-adjustment">- 5s</button>
   </div>
+  <div>
+    <label>Workouts: </label>
+    <span id="workouts-number"></span>
+    <button id="increase-workouts-number"> + </button>
+    <button id="decrease-workouts-number"> - </button>
+  </div>
 </section>
 <script>
   // time unit is seconds by default
   const defaultWorkoutTime = 30;
   const defaultRestTime = 10;
-  const defaultTotalTime = defaultWorkoutTime + defaultRestTime;
+  const defaultWorkoutsNumber = 5;
+  const defaultTotalTime = defaultWorkoutsNumber * defaultWorkoutTime + ( defaultWorkoutsNumber - 1 ) *defaultRestTime;
   const incrementTime = 5;
   let workoutTime = defaultWorkoutTime;
   let restTime = defaultRestTime;
   let totalTime = defaultTotalTime;
+  let workoutsNumber = defaultWorkoutsNumber;
   let timer = null;
 
   function startTimer() {
@@ -115,12 +123,36 @@
   }
 
   function calculateTotalTime() {
-    totalTime = workoutTime + restTime;
+    const totalWorkoutTime = workoutsNumber * workoutTime;
+    const totalRestTime = ( workoutsNumber - 1 ) * restTime;
+    totalTime = totalWorkoutTime + totalRestTime;
+  }
+
+  function increaseWorkoutsNumber() {
+    workoutsNumber += 1;
+    calculateTotalTime();
+    renderWorkoutsNumber(workoutsNumber);
+    renderTimeAt(totalTime, '#timer');
+  }
+
+  function decreaseWorkoutsNumber() {
+    let newWorkoutsNumber = workoutsNumber - 1;
+    if (newWorkoutsNumber < 0) {
+      newWorkoutsNumber = 0
+    }
+    workoutsNumber = newWorkoutsNumber;
+    calculateTotalTime();
+    renderWorkoutsNumber(workoutsNumber);
+    renderTimeAt(totalTime, '#timer');
   }
 
   function renderTimeAt(timeInSeconds, selector) {
     const {minutes, seconds} = getMinutesAndSecondsFromTotalSeconds(timeInSeconds);
     document.querySelector(selector).innerHTML = stringifyMinutesAndSeconds(minutes, seconds);
+  }
+
+  function renderWorkoutsNumber(value) {
+    document.querySelector('#workouts-number').innerHTML = value.toString();
   }
 
   function getMinutesAndSecondsFromTotalSeconds(totalSeconds) {
@@ -145,6 +177,8 @@
     document.querySelector('#decrease-workout-time').addEventListener('click', decreaseWorkoutTime);
     document.querySelector('#increase-rest-time').addEventListener('click', increaseRestTime);
     document.querySelector('#decrease-rest-time').addEventListener('click', decreaseRestTime);
+    document.querySelector('#increase-workouts-number').addEventListener('click', increaseWorkoutsNumber);
+    document.querySelector('#decrease-workouts-number').addEventListener('click', decreaseWorkoutsNumber);
   }
 
   window.addEventListener('load', () => {
@@ -152,6 +186,7 @@
     renderTimeAt(defaultTotalTime, '#timer');
     renderTimeAt(defaultWorkoutTime, '#workout-time');
     renderTimeAt(defaultRestTime, '#rest-time');
+    renderWorkoutsNumber(defaultWorkoutsNumber);
   });
 </script>
 </body>
