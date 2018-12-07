@@ -34,18 +34,28 @@
     <button id="increase-workouts-number"> + </button>
     <button id="decrease-workouts-number"> - </button>
   </div>
+  <div>
+    <label>Repetitions: </label>
+    <span id="repetitions-number"></span>
+    <button id="increase-repetitions-number"> + </button>
+    <button id="decrease-repetitions-number"> - </button>
+  </div>
 </section>
 <script>
   // time unit is seconds by default
   const defaultWorkoutTime = 30;
   const defaultRestTime = 10;
   const defaultWorkoutsNumber = 5;
-  const defaultTotalTime = defaultWorkoutsNumber * defaultWorkoutTime + ( defaultWorkoutsNumber - 1 ) *defaultRestTime;
+  const defaultRepetitionsNumber = 3;
+  const defaultWorkoutTimePerRepetition = defaultWorkoutsNumber * defaultWorkoutTime;
+  const defaultRestTimePerRepetition = ( defaultWorkoutsNumber - 1 ) * defaultRestTime;
+  const defaultTotalTime = defaultRepetitionsNumber * (defaultWorkoutTimePerRepetition + defaultRestTimePerRepetition);
   const incrementTime = 5;
   let workoutTime = defaultWorkoutTime;
   let restTime = defaultRestTime;
   let totalTime = defaultTotalTime;
   let workoutsNumber = defaultWorkoutsNumber;
+  let repetitionsNumber = defaultRepetitionsNumber;
   let timer = null;
 
   function startTimer() {
@@ -123,9 +133,9 @@
   }
 
   function calculateTotalTime() {
-    const totalWorkoutTime = workoutsNumber * workoutTime;
-    const totalRestTime = ( workoutsNumber - 1 ) * restTime;
-    totalTime = totalWorkoutTime + totalRestTime;
+    const workoutTimePerRepetition = workoutsNumber * workoutTime;
+    const restTimePerRepetition = ( workoutsNumber - 1 ) * restTime;
+    totalTime = repetitionsNumber * (workoutTimePerRepetition + restTimePerRepetition);
   }
 
   function increaseWorkoutsNumber() {
@@ -146,6 +156,24 @@
     renderTimeAt(totalTime, '#timer');
   }
 
+  function increaseRepetitionsNumber() {
+    repetitionsNumber += 1;
+    calculateTotalTime();
+    renderRepetitionsNumber(repetitionsNumber);
+    renderTimeAt(totalTime, '#timer');
+  }
+
+  function decreaseRepetitionsNumber() {
+    let newRepetitionsNumber = repetitionsNumber - 1;
+    if (newRepetitionsNumber < 0) {
+      newRepetitionsNumber = 0
+    }
+    repetitionsNumber = newRepetitionsNumber;
+    calculateTotalTime();
+    renderRepetitionsNumber(repetitionsNumber);
+    renderTimeAt(totalTime, '#timer');
+  }
+
   function renderTimeAt(timeInSeconds, selector) {
     const {minutes, seconds} = getMinutesAndSecondsFromTotalSeconds(timeInSeconds);
     document.querySelector(selector).innerHTML = stringifyMinutesAndSeconds(minutes, seconds);
@@ -153,6 +181,10 @@
 
   function renderWorkoutsNumber(value) {
     document.querySelector('#workouts-number').innerHTML = value.toString();
+  }
+
+  function renderRepetitionsNumber(value) {
+    document.querySelector('#repetitions-number').innerHTML = value.toString();
   }
 
   function getMinutesAndSecondsFromTotalSeconds(totalSeconds) {
@@ -179,6 +211,8 @@
     document.querySelector('#decrease-rest-time').addEventListener('click', decreaseRestTime);
     document.querySelector('#increase-workouts-number').addEventListener('click', increaseWorkoutsNumber);
     document.querySelector('#decrease-workouts-number').addEventListener('click', decreaseWorkoutsNumber);
+    document.querySelector('#increase-repetitions-number').addEventListener('click', increaseRepetitionsNumber);
+    document.querySelector('#decrease-repetitions-number').addEventListener('click', decreaseRepetitionsNumber);
   }
 
   window.addEventListener('load', () => {
@@ -187,6 +221,7 @@
     renderTimeAt(defaultWorkoutTime, '#workout-time');
     renderTimeAt(defaultRestTime, '#rest-time');
     renderWorkoutsNumber(defaultWorkoutsNumber);
+    renderRepetitionsNumber(defaultRepetitionsNumber);
   });
 </script>
 </body>
