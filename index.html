@@ -68,17 +68,15 @@ function stopTimer() {
 
 function countdown(endTimePoint) {
   const now = Date.now();
-  const remainingSeconds = ( endTimePoint - now ) / 1000;
+  timerSeconds = ( endTimePoint - now ) / 1000;
 
-  if (remainingSeconds <= 0) {
+  if (timerSeconds <= 0) {
     clearInterval(timer);
     timer = null;
     timerSeconds = 0;
-    renderRemainingTime(0);
-  } else {
-    renderRemainingTime(remainingSeconds);
-    timerSeconds = remainingSeconds;
   }
+
+  renderRemainingTime(timerSeconds);
 }
 
 function renderRemainingTime(remainingSeconds) {
