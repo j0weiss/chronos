@@ -9,26 +9,37 @@
   <h1>Chronos</h1>
 </header>
 <section>
-  <div id="timer">
-
-  </div>
+  <div id="timer"></div>
   <button id="start-timer">Start</button>
   <button id="stop-timer">Stop</button>
 </section>
 <script>
-const INITIAL_TIMER_VALUE = 3*60;
+const REMAINING_MILLISECONDS = 3*60*1000;
 let timer = null;
 
 function startTimer() {
-  timer = setInterval(test, 1000);
+  const end = Date.now() + REMAINING_MILLISECONDS;
+  timer = setInterval(countdown, 1000, end);
+  renderRemainingTime(REMAINING_MILLISECONDS);
 }
 
 function stopTimer() {
   clearInterval(timer);
 }
 
-function test() {
-  console.log('test');
+function countdown(endTimePoint) {
+  const now = Date.now();
+  renderRemainingTime(endTimePoint - now);
+}
+
+function renderRemainingTime(milliseconds) {
+  const minutes = Math.round(( milliseconds / 1000 ) / 60);
+  const seconds = Math.round(( milliseconds / 1000 ) % 60);
+
+  const minutesString = minutes < 10 ? '0' + minutes : minutes;
+  const secondsString = seconds < 10 ? '0' + seconds : seconds;
+
+  document.querySelector('#timer').innerHTML = minutesString + ':' + secondsString;
 }
 
 function registerEvents() {
