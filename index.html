@@ -9,102 +9,146 @@
   <h1>Chronos</h1>
 </header>
 <section>
-  <div id="timer"></div>
-  <button id="start-timer">Start</button>
-  <button id="pause-timer">Pause</button>
-  <button id="stop-timer">Stop</button>
-  <button id="increase-timer">+ 15s</button>
-  <button id="decrease-timer">- 15s</button>
+  <div>
+    <span id="timer"></span>
+    <button id="start-timer">Start</button>
+    <button id="pause-timer">Pause</button>
+    <button id="stop-timer">Stop</button>
+  </div>
+  <div>
+    <span id="workout-time"></span>
+    <button id="increase-workout-time" class="time-adjustment">+ 5s</button>
+    <button id="decrease-workout-time" class="time-adjustment">- 5s</button>
+  </div>
+  <div>
+    <span id="rest-time"></span>
+    <button id="increase-rest-time" class="time-adjustment">+ 5s</button>
+    <button id="decrease-rest-time" class="time-adjustment">- 5s</button>
+  </div>
 </section>
 <script>
-  const defaultTimerSeconds = 3 * 60;
-  let timerSeconds = defaultTimerSeconds;
+  // time unit is seconds by default
+  const defaultWorkoutTime = 30;
+  const defaultRestTime = 10;
+  const defaultTotalTime = defaultWorkoutTime + defaultRestTime;
+  const incrementTime = 5;
+  let workoutTime = defaultWorkoutTime;
+  let restTime = defaultRestTime;
+  let totalTime = defaultTotalTime;
   let timer = null;
 
   function startTimer() {
     if (!timer) {
-      const end = Date.now() + timerSeconds * 1000;
+      const end = Date.now() + totalTime * 1000;
       timer = setInterval(countdown, 1000, end);
-      renderRemainingTime(timerSeconds);
+      renderTimeAt(totalTime, '#timer');
     }
   }
 
   function countdown(endTimePoint) {
     const now = Date.now();
-    timerSeconds = (endTimePoint - now) / 1000;
+    totalTime = (endTimePoint - now) / 1000;
 
-    if (timerSeconds <= 0) {
+    if (totalTime <= 0) {
       clearInterval(timer);
       timer = null;
-      timerSeconds = 0;
+      totalTime = 0;
     }
 
-    renderRemainingTime(timerSeconds);
+    renderTimeAt(totalTime, '#timer');
   }
 
   function pauseTimer() {
     if (timer) {
       clearInterval(timer);
+      timer = null;
     }
   }
 
   function stopTimer() {
-    if (timer) {
-      clearInterval(timer);
-      timer = null;
-      timerSeconds = defaultTimerSeconds;
-      renderRemainingTime(timerSeconds);
-    }
-  }
-  
-  function increaseTimer() {
-    adjustTimer(15);
+    pauseTimer();
+    calculateTotalTime();
+    renderTimeAt(totalTime, '#timer');
   }
 
-  function decreaseTimer() {
-    adjustTimer(-15);
+  function increaseWorkoutTime() {
+    adjustWorkoutTime(incrementTime);
   }
 
-  function adjustTimer(adjustmentInSeconds) {
-    if (timer) {
-      pauseTimer();
-    }
-
-    let newTimerSeconds = timerSeconds + adjustmentInSeconds;
-    if (newTimerSeconds < 0) {
-      newTimerSeconds = 0
-    }
-
-    timerSeconds = newTimerSeconds;
-    renderRemainingTime(timerSeconds);
-
-    if (timer) {
-      timer = null;
-      startTimer();
-    }
+  function decreaseWorkoutTime() {
+    adjustWorkoutTime(-incrementTime);
   }
 
-  function renderRemainingTime(remainingSeconds) {
-    const minutes = Math.floor(remainingSeconds / 60);
-    const seconds = Math.ceil(remainingSeconds % 60) % 60;
+  function adjustWorkoutTime(adjustmentInSeconds) {
+    let newTime = workoutTime + adjustmentInSeconds;
+    if (newTime < 0) {
+      newTime = 0
+    }
 
-    const minutesString = minutes < 10 ? '0' + minutes : minutes;
-    const secondsString = seconds < 10 ? '0' + seconds : seconds;
+    workoutTime = newTime;
+    calculateTotalTime();
+    renderTimeAt(workoutTime, '#workout-time');
+    renderTimeAt(totalTime, '#timer');
+  }
 
-    document.querySelector('#timer').innerHTML = minutesString + ':' + secondsString;
+  function increaseRestTime() {
+    adjustRestTime(incrementTime);
+  }
+
+  function decreaseRestTime() {
+    adjustRestTime(-incrementTime);
+  }
+
+  function adjustRestTime(adjustmentInSeconds) {
+    let newTime = restTime + adjustmentInSeconds;
+    if (newTime < 0) {
+      newTime = 0
+    }
+
+    restTime = newTime;
+    calculateTotalTime();
+    renderTimeAt(restTime, '#rest-time');
+    renderTimeAt(totalTime, '#timer');
+  }
+
+  function calculateTotalTime() {
+    totalTime = workoutTime + restTime;
+  }
+
+  function renderTimeAt(timeInSeconds, selector) {
+    const {minutes, seconds} = getMinutesAndSecondsFromTotalSeconds(timeInSeconds);
+    document.querySelector(selector).innerHTML = stringifyMinutesAndSeconds(minutes, seconds);
+  }
+
+  function getMinutesAndSecondsFromTotalSeconds(totalSeconds) {
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = Math.ceil(totalSeconds % 60) % 60;
+
+    return {minutes, seconds}
+  }
+
+  function stringifyMinutesAndSeconds(minutes, seconds) {
+    const minutesString = minutes < 10 ? '0' + minutes.toString() : minutes.toString();
+    const secondsString = seconds < 10 ? '0' + seconds.toString() : seconds.toString();
+
+    return minutesString + ':' + secondsString;
   }
 
   function registerEvents() {
     document.querySelector('#start-timer').addEventListener('click', startTimer);
     document.querySelector('#pause-timer').addEventListener('click', pauseTimer);
     document.querySelector('#stop-timer').addEventListener('click', stopTimer);
-    document.querySelector('#increase-timer').addEventListener('click', increaseTimer);
-    document.querySelector('#decrease-timer').addEventListener('click', decreaseTimer);
+    document.querySelector('#increase-workout-time').addEventListener('click', increaseWorkoutTime);
+    document.querySelector('#decrease-workout-time').addEventListener('click', decreaseWorkoutTime);
+    document.querySelector('#increase-rest-time').addEventListener('click', increaseRestTime);
+    document.querySelector('#decrease-rest-time').addEventListener('click', decreaseRestTime);
   }
 
   window.addEventListener('load', () => {
     registerEvents();
-    renderRemainingTime(timerSeconds);
+    renderTimeAt(defaultTotalTime, '#timer');
+    renderTimeAt(defaultWorkoutTime, '#workout-time');
+    renderTimeAt(defaultRestTime, '#rest-time');
   });
 </script>
 </body>
