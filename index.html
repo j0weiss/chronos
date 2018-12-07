@@ -21,6 +21,42 @@
   let timerSeconds = defaultTimerSeconds;
   let timer = null;
 
+  function startTimer() {
+    if (!timer) {
+      const end = Date.now() + timerSeconds * 1000;
+      timer = setInterval(countdown, 1000, end);
+      renderRemainingTime(timerSeconds);
+    }
+  }
+
+  function countdown(endTimePoint) {
+    const now = Date.now();
+    timerSeconds = (endTimePoint - now) / 1000;
+
+    if (timerSeconds <= 0) {
+      clearInterval(timer);
+      timer = null;
+      timerSeconds = 0;
+    }
+
+    renderRemainingTime(timerSeconds);
+  }
+
+  function pauseTimer() {
+    if (timer) {
+      clearInterval(timer);
+    }
+  }
+
+  function stopTimer() {
+    if (timer) {
+      clearInterval(timer);
+      timer = null;
+      timerSeconds = defaultTimerSeconds;
+      renderRemainingTime(timerSeconds);
+    }
+  }
+  
   function increaseTimer() {
     adjustTimer(15);
   }
@@ -46,42 +82,6 @@
       timer = null;
       startTimer();
     }
-  }
-
-  function startTimer() {
-    if (!timer) {
-      const end = Date.now() + timerSeconds * 1000;
-      timer = setInterval(countdown, 1000, end);
-      renderRemainingTime(timerSeconds);
-    }
-  }
-
-  function pauseTimer() {
-    if (timer) {
-      clearInterval(timer);
-    }
-  }
-
-  function stopTimer() {
-    if (timer) {
-      clearInterval(timer);
-      timer = null;
-      timerSeconds = defaultTimerSeconds;
-      renderRemainingTime(timerSeconds);
-    }
-  }
-
-  function countdown(endTimePoint) {
-    const now = Date.now();
-    timerSeconds = (endTimePoint - now) / 1000;
-
-    if (timerSeconds <= 0) {
-      clearInterval(timer);
-      timer = null;
-      timerSeconds = 0;
-    }
-
-    renderRemainingTime(timerSeconds);
   }
 
   function renderRemainingTime(remainingSeconds) {
