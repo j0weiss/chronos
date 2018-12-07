@@ -13,16 +13,27 @@
 
   </div>
   <button id="start-timer">Start</button>
+  <button id="stop-timer">Stop</button>
 </section>
 <script>
 const INITIAL_TIMER_VALUE = 3*60;
+let timer = null;
 
 function startTimer() {
-  console.log('start timer');
+  timer = setInterval(test, 1000);
+}
+
+function stopTimer() {
+  clearInterval(timer);
+}
+
+function test() {
+  console.log('test');
 }
 
 function registerEvents() {
-  document.querySelector('#start-timer').addEventListener('click', startTimer)
+  document.querySelector('#start-timer').addEventListener('click', startTimer);
+  document.querySelector('#stop-timer').addEventListener('click', stopTimer);
 }
 
 window.addEventListener('load', () => registerEvents());
