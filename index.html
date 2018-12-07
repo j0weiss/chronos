@@ -47,7 +47,10 @@ function registerEvents() {
   document.querySelector('#stop-timer').addEventListener('click', stopTimer);
 }
 
-window.addEventListener('load', () => registerEvents());
+window.addEventListener('load', () => {
+  registerEvents();
+  renderRemainingTime(timerMilliseconds);
+});
 </script>
 </body>
 </html>
