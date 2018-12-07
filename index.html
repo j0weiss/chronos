@@ -17,25 +17,25 @@
   <button id="decrease-timer">- 15s</button>
 </section>
 <script>
-const defaultTimerMilliseconds = 3*60*1000;
-let timerMilliseconds = defaultTimerMilliseconds;
+const defaultTimerSeconds = 3*60;
+let timerSeconds = defaultTimerSeconds;
 let timer = null;
 
 function increaseTimer() {
-  adjustTimer(15000);
+  adjustTimer(15);
 }
 
 function decreaseTimer() {
-  adjustTimer(-15000);
+  adjustTimer(-15);
 }
 
-function adjustTimer(adjustmentInMilliseconds) {
+function adjustTimer(adjustmentInSeconds) {
   if (timer) {
     pauseTimer();
   }
 
-  timerMilliseconds = timerMilliseconds + adjustmentInMilliseconds;
-  renderRemainingTime(timerMilliseconds);
+  timerSeconds = timerSeconds + adjustmentInSeconds;
+  renderRemainingTime(timerSeconds);
 
   if (timer) {
     timer = null;
@@ -45,9 +45,9 @@ function adjustTimer(adjustmentInMilliseconds) {
 
 function startTimer() {
   if (!timer) {
-    const end = Date.now() + timerMilliseconds;
+    const end = Date.now() + timerSeconds * 1000;
     timer = setInterval(countdown, 1000, end);
-    renderRemainingTime(timerMilliseconds);
+    renderRemainingTime(timerSeconds);
   }
 }
 
@@ -61,21 +61,29 @@ function stopTimer() {
   if (timer) {
     clearInterval(timer);
     timer = null;
-    timerMilliseconds = defaultTimerMilliseconds;
-    renderRemainingTime(timerMilliseconds);
+    timerSeconds = defaultTimerSeconds;
+    renderRemainingTime(timerSeconds);
   }
 }
 
 function countdown(endTimePoint) {
   const now = Date.now();
-  const remainingMilliseconds = endTimePoint - now;
-  renderRemainingTime(remainingMilliseconds);
-  timerMilliseconds = remainingMilliseconds;
+  const remainingSeconds = ( endTimePoint - now ) / 1000;
+
+  if (remainingSeconds <= 0) {
+    clearInterval(timer);
+    timer = null;
+    timerSeconds = 0;
+    renderRemainingTime(0);
+  } else {
+    renderRemainingTime(remainingSeconds);
+    timerSeconds = remainingSeconds;
+  }
 }
 
-function renderRemainingTime(milliseconds) {
-  const minutes = Math.floor(( milliseconds / 1000 ) / 60);
-  const seconds = Math.ceil(( milliseconds / 1000 ) % 60) % 60;
+function renderRemainingTime(remainingSeconds) {
+  const minutes = Math.floor( remainingSeconds / 60);
+  const seconds = Math.ceil( remainingSeconds % 60) % 60;
 
   const minutesString = minutes < 10 ? '0' + minutes : minutes;
   const secondsString = seconds < 10 ? '0' + seconds : seconds;
@@ -93,7 +101,7 @@ function registerEvents() {
 
 window.addEventListener('load', () => {
   registerEvents();
-  renderRemainingTime(timerMilliseconds);
+  renderRemainingTime(timerSeconds);
 });
 </script>
 </body>
