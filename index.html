@@ -30,12 +30,21 @@ function decreaseTimer() {
 }
 
 function adjustTimer(adjustmentInMilliseconds) {
+  if (timer) {
+    pauseTimer();
+  }
+
   timerMilliseconds = timerMilliseconds + adjustmentInMilliseconds;
   renderRemainingTime(timerMilliseconds);
+
+  if (timer) {
+    timer = null;
+    startTimer();
+  }
 }
 
 function startTimer() {
-  if (timer === null) {
+  if (!timer) {
     const end = Date.now() + timerMilliseconds;
     timer = setInterval(countdown, 1000, end);
     renderRemainingTime(timerMilliseconds);
@@ -45,7 +54,6 @@ function startTimer() {
 function pauseTimer() {
   if (timer) {
     clearInterval(timer);
-    timer = null;
   }
 }
 
