@@ -16,7 +16,8 @@
   <button id="decrease-timer">- 15s</button>
 </section>
 <script>
-let timerMilliseconds = 3*60*1000;
+const defaultTimerMilliseconds = 3*60*1000;
+let timerMilliseconds = defaultTimerMilliseconds;
 let timer = null;
 
 function increaseTimer() {
@@ -43,11 +44,15 @@ function startTimer() {
 function stopTimer() {
   clearInterval(timer);
   timer = null;
+  timerMilliseconds = defaultTimerMilliseconds;
+  renderRemainingTime(timerMilliseconds);
 }
 
 function countdown(endTimePoint) {
   const now = Date.now();
-  renderRemainingTime(endTimePoint - now);
+  const remainingMilliseconds = endTimePoint - now;
+  renderRemainingTime(remainingMilliseconds);
+  timerMilliseconds = remainingMilliseconds;
 }
 
 function renderRemainingTime(milliseconds) {
