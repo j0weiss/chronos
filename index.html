@@ -34,7 +34,12 @@
       pauseTimer();
     }
 
-    timerSeconds = timerSeconds + adjustmentInSeconds;
+    let newTimerSeconds = timerSeconds + adjustmentInSeconds;
+    if (newTimerSeconds < 0) {
+      newTimerSeconds = 0
+    }
+
+    timerSeconds = newTimerSeconds;
     renderRemainingTime(timerSeconds);
 
     if (timer) {
