@@ -18,13 +18,16 @@ const REMAINING_MILLISECONDS = 3*60*1000;
 let timer = null;
 
 function startTimer() {
-  const end = Date.now() + REMAINING_MILLISECONDS;
-  timer = setInterval(countdown, 1000, end);
-  renderRemainingTime(REMAINING_MILLISECONDS);
+  if (timer === null) {
+    const end = Date.now() + timerMilliseconds;
+    timer = setInterval(countdown, 1000, end);
+    renderRemainingTime(timerMilliseconds);
+  }
 }
 
 function stopTimer() {
   clearInterval(timer);
+  timer = null;
 }
 
 function countdown(endTimePoint) {
