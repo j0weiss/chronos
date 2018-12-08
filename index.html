@@ -49,7 +49,8 @@
   const defaultRepetitionsNumber = 3;
   const defaultWorkoutTimePerRepetition = defaultWorkoutsNumber * defaultWorkoutTime;
   const defaultRestTimePerRepetition = ( defaultWorkoutsNumber - 1 ) * defaultRestTime;
-  const defaultTotalTime = defaultRepetitionsNumber * (defaultWorkoutTimePerRepetition + defaultRestTimePerRepetition);
+  const defaultRestTimeBetweenRepetitions = ( defaultRepetitionsNumber - 1 ) * defaultRestTime;
+  const defaultTotalTime = defaultRepetitionsNumber * (defaultWorkoutTimePerRepetition + defaultRestTimePerRepetition) + defaultRestTimeBetweenRepetitions;
   const incrementTime = 5;
   let workoutTime = defaultWorkoutTime;
   let restTime = defaultRestTime;
@@ -135,7 +136,8 @@
   function calculateTotalTime() {
     const workoutTimePerRepetition = workoutsNumber * workoutTime;
     const restTimePerRepetition = ( workoutsNumber - 1 ) * restTime;
-    totalTime = repetitionsNumber * (workoutTimePerRepetition + restTimePerRepetition);
+    const restTimeBetweenRepetitions = (repetitionsNumber -1) * restTime;
+    totalTime = repetitionsNumber * (workoutTimePerRepetition + restTimePerRepetition) + restTimeBetweenRepetitions;
   }
 
   function increaseWorkoutsNumber() {
