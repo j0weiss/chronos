@@ -69,7 +69,7 @@
 
   function countdown(endTimePoint) {
     const now = Date.now();
-    totalTime = (endTimePoint - now) / 1000;
+    totalTime = Math.round((endTimePoint - now) / 1000);
 
     if (totalTime <= 0) {
       clearInterval(timer);
