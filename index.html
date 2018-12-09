@@ -216,6 +216,7 @@
           timer = setInterval(countdown, 1000, end);
           renderTimeAt(totalTime, '#timer');
           renderWorkoutMode();
+          playWorkoutSound();
           showSettings(false);
         }
       }
@@ -235,9 +236,12 @@
           timer = null;
           totalTime = 0;
           resetRenderMode();
+          playWorkoutFinishedSound();
+          showSettings(true);
+        } else {
+          countDownWorkoutRestTimers();
         }
 
-        countDownWorkoutRestTimers();
         renderTimeAt(totalTime, '#timer');
       }
 
@@ -245,6 +249,7 @@
         if (document.querySelector('#timer').classList.contains('workout')) {
           if (remainingTimes.workoutTime - 1 < 0) {
             toggleWorkoutRestMode();
+            playRestSound();
             remainingTimes.workoutTime = workoutTime - 1;
           } else {
             remainingTimes.workoutTime -= 1;
@@ -252,6 +257,7 @@
         } else if (document.querySelector('#timer').classList.contains('rest')) {
           if (remainingTimes.restTime - 1 < 0) {
             toggleWorkoutRestMode();
+            playRestSound()
             remainingTimes.restTime = restTime - 1;
           } else {
             remainingTimes.restTime -= 1;
@@ -383,6 +389,21 @@
 
       function renderRepetitionsNumber(value) {
         document.querySelector('#repetitions-number').innerHTML = value.toString();
+      }
+
+      function playWorkoutSound() {
+        const audio = new Audio('sounds/workout.wav');
+        audio.play();
+      }
+
+      function playRestSound() {
+        const audio = new Audio('sounds/rest.wav');
+        audio.play();
+      }
+
+      function playWorkoutFinishedSound() {
+        const audio = new Audio('sounds/workout_finished.wav');
+        audio.play();
       }
 
       function getMinutesAndSecondsFromTotalSeconds(totalSeconds) {
