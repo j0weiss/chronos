@@ -331,8 +331,8 @@
 
       function decreaseWorkoutsNumber() {
         let newWorkoutsNumber = workoutsNumber - 1;
-        if (newWorkoutsNumber < 0) {
-          newWorkoutsNumber = 0
+        if (newWorkoutsNumber < 1) {
+          newWorkoutsNumber = 1
         }
         workoutsNumber = newWorkoutsNumber;
         calculateTotalTime();
@@ -349,8 +349,8 @@
 
       function decreaseRepetitionsNumber() {
         let newRepetitionsNumber = repetitionsNumber - 1;
-        if (newRepetitionsNumber < 0) {
-          newRepetitionsNumber = 0
+        if (newRepetitionsNumber < 1) {
+          newRepetitionsNumber = 1
         }
         repetitionsNumber = newRepetitionsNumber;
         calculateTotalTime();
