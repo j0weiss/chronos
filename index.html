@@ -4,51 +4,163 @@
   <meta charset="UTF-8">
   <title>Chronos</title>
   <style>
+    body {
+      --dark: #393e46;
+      --medium-dark: #5c636e;
+      --light: #f7f7f7;
+      --primary: #f8b500;
+
+      font: 40px sans-serif;
+      box-sizing: border-box;
+      height: 100vh;
+      margin: 0;
+      background: var(--dark);
+      color: var(--light);
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      padding: 1em 0;
+      text-align: center;
+      color: var(--medium-dark);
+    }
+
+    main {
+      flex: 1 1 auto;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    #timer {
+      font-size: 3em;
+      text-align: center;
+      padding: 1em 0 0.5em 0;
+    }
+
     #timer.workout {
       color: green;
     }
+
     #timer.rest {
       color: blue;
+    }
+
+    section.timer-controls {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 0 15%;
+    }
+
+    .hide-settings {
+      display: none;
+    }
+
+    .setting {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .setting button {
+      width: 4em;
+    }
+
+    .setting-value {
+      width: 4em;
+      margin: 0.75em 1em 0 1em;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .setting-value label {
+      color: var(--medium-dark);
+      font-size: 0.5em;
+      margin-top: 0.25em;
+    }
+
+    footer {
+      width: 100%;
+      margin-top: 1em;
+      padding: 0.5em 0;
+      text-align: center;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1em;
+    }
+
+    button {
+      font-size: 1em;
+      color: var(--light);
+      background-color: transparent;
+      border: 1px solid var(--light);
+      border-radius: 10px;
+      padding: 0.25em 1em;
+      cursor: pointer;
+    }
+
+    a {
+      color: var(--medium-dark);
+      text-decoration: none;
     }
   </style>
 </head>
 <body>
   <header>
-    <h1>Chronos</h1>
+    <h1>chronos</h1>
   </header>
-  <section>
-    <div>
-      <label>Timer: </label>
-      <span id="timer"></span>
-      <button id="start-timer">Start</button>
-      <button id="pause-timer">Pause</button>
-      <button id="stop-timer">Stop</button>
-    </div>
-    <div>
-      <label>Workout Time: </label>
-      <span id="workout-time"></span>
-      <button id="increase-workout-time" class="time-adjustment">+ 5s</button>
-      <button id="decrease-workout-time" class="time-adjustment">- 5s</button>
-    </div>
-    <div>
-      <label>Rest Time: </label>
-      <span id="rest-time"></span>
-      <button id="increase-rest-time" class="time-adjustment">+ 5s</button>
-      <button id="decrease-rest-time" class="time-adjustment">- 5s</button>
-    </div>
-    <div>
-      <label>Workouts: </label>
-      <span id="workouts-number"></span>
-      <button id="increase-workouts-number"> + </button>
-      <button id="decrease-workouts-number"> - </button>
-    </div>
-    <div>
-      <label>Repetitions: </label>
-      <span id="repetitions-number"></span>
-      <button id="increase-repetitions-number"> + </button>
-      <button id="decrease-repetitions-number"> - </button>
-    </div>
-  </section>
+  <main>
+    <section>
+      <div id="timer"></div>
+      <section class="timer-controls">
+        <button id="start-timer">Start</button>
+        <button id="pause-timer">Pause</button>
+        <button id="stop-timer">Stop</button>
+      </section>
+    </section>
+    <section id="settings-section">
+      <div class="setting">
+        <button id="decrease-workout-time">- 5s</button>
+        <div class="setting-value">
+          <span id="workout-time"></span>
+          <label>Workout Time</label>
+        </div>
+        <button id="increase-workout-time">+ 5s</button>
+      </div>
+      <div class="setting">
+        <button id="decrease-rest-time">- 5s</button>
+        <div class="setting-value">
+          <span id="rest-time"></span>
+          <label>Rest Time</label>
+        </div>
+        <button id="increase-rest-time">+ 5s</button>
+      </div>
+      <div class="setting">
+          <button id="decrease-workouts-number">-</button>
+          <div class="setting-value">
+            <span id="workouts-number"></span>
+            <label>Workouts</label>
+          </div>
+          <button id="increase-workouts-number">+</button>
+      </div>
+      <div class="setting">
+        <button id="decrease-repetitions-number">-</button>
+        <div class="setting-value">
+          <span id="repetitions-number"></span>
+          <label>Repetitions</label>
+        </div>
+        <button id="increase-repetitions-number">+</button>
+      </div>
+    </section>
+  </main>
+  <footer>
+    <a href="https://github.com/j0weiss/chronos">Github</a>
+  </footer>
   <script>
     (function chronos() {
       // time unit is seconds by default
@@ -78,6 +190,7 @@
           timer = setInterval(countdown, 1000, end);
           renderTimeAt(totalTime, '#timer');
           renderWorkoutMode();
+          showSettings(false);
         }
       }
 
@@ -133,6 +246,7 @@
         remainingTimes = null;
         calculateTotalTime();
         renderTimeAt(totalTime, '#timer');
+        showSettings(true);
       }
 
       function increaseWorkoutTime() {
@@ -257,6 +371,11 @@
         const secondsString = seconds < 10 ? '0' + seconds.toString() : seconds.toString();
 
         return minutesString + ':' + secondsString;
+      }
+
+      function showSettings(value) {
+        const settings = document.querySelector('#settings-section');
+        settings.classList.toggle('hide-settings', !value)
       }
 
       function registerEvents() {
