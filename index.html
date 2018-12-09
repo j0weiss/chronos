@@ -50,237 +50,238 @@
   </div>
 </section>
 <script>
-  // time unit is seconds by default
-  const defaultWorkoutTime = 30;
-  const defaultRestTime = 10;
-  const defaultWorkoutsNumber = 5;
-  const defaultRepetitionsNumber = 3;
-  const defaultWorkoutTimePerRepetition = defaultWorkoutsNumber * defaultWorkoutTime;
-  const defaultRestTimePerRepetition = ( defaultWorkoutsNumber - 1 ) * defaultRestTime;
-  const defaultRestTimeBetweenRepetitions = ( defaultRepetitionsNumber - 1 ) * defaultRestTime;
-  const defaultTotalTime = defaultRepetitionsNumber * (defaultWorkoutTimePerRepetition + defaultRestTimePerRepetition) + defaultRestTimeBetweenRepetitions;
-  const incrementTime = 5;
-  let workoutTime = defaultWorkoutTime;
-  let restTime = defaultRestTime;
-  let totalTime = defaultTotalTime;
-  let workoutsNumber = defaultWorkoutsNumber;
-  let repetitionsNumber = defaultRepetitionsNumber;
-  let remainingTimes = null;
-  let timer = null;
+  (function chronos() {
+    // time unit is seconds by default
+    const defaultWorkoutTime = 30;
+    const defaultRestTime = 10;
+    const defaultWorkoutsNumber = 5;
+    const defaultRepetitionsNumber = 3;
+    const defaultWorkoutTimePerRepetition = defaultWorkoutsNumber * defaultWorkoutTime;
+    const defaultRestTimePerRepetition = (defaultWorkoutsNumber - 1) * defaultRestTime;
+    const defaultRestTimeBetweenRepetitions = (defaultRepetitionsNumber - 1) * defaultRestTime;
+    const defaultTotalTime = defaultRepetitionsNumber * (defaultWorkoutTimePerRepetition + defaultRestTimePerRepetition) + defaultRestTimeBetweenRepetitions;
+    const incrementTime = 5;
+    let workoutTime = defaultWorkoutTime;
+    let restTime = defaultRestTime;
+    let totalTime = defaultTotalTime;
+    let workoutsNumber = defaultWorkoutsNumber;
+    let repetitionsNumber = defaultRepetitionsNumber;
+    let remainingTimes = null;
+    let timer = null;
 
-  function startTimer() {
-    if (!timer) {
-      if (!remainingTimes) {
-        setRemainingTimes();
+    function startTimer() {
+      if (!timer) {
+        if (!remainingTimes) {
+          setRemainingTimes();
+        }
+        const end = Date.now() + totalTime * 1000;
+        timer = setInterval(countdown, 1000, end);
+        renderTimeAt(totalTime, '#timer');
+        renderWorkoutMode();
       }
-      const end = Date.now() + totalTime * 1000;
-      timer = setInterval(countdown, 1000, end);
+    }
+
+    function setRemainingTimes() {
+      remainingTimes = {};
+      remainingTimes.workoutTime = workoutTime - 1;
+      remainingTimes.restTime = restTime - 1;
+    }
+
+    function countdown(endTimePoint) {
+      const now = Date.now();
+      totalTime = Math.round((endTimePoint - now) / 1000);
+
+      if (totalTime <= 0) {
+        clearInterval(timer);
+        timer = null;
+        totalTime = 0;
+        resetRenderMode();
+      }
+
+      countDownWorkoutRestTimers();
       renderTimeAt(totalTime, '#timer');
-      renderWorkoutMode();
     }
-  }
 
-  function setRemainingTimes() {
-    remainingTimes = {};
-    remainingTimes.workoutTime = workoutTime - 1;
-    remainingTimes.restTime = restTime - 1;
-  }
+    function countDownWorkoutRestTimers() {
+      if (document.querySelector('#timer').classList.contains('workout')) {
+        if (remainingTimes.workoutTime - 1 < 0) {
+          toggleWorkoutRestMode();
+          remainingTimes.workoutTime = workoutTime - 1;
+        } else {
+          remainingTimes.workoutTime -= 1;
+        }
+      } else if (document.querySelector('#timer').classList.contains('rest')) {
+        if (remainingTimes.restTime - 1 < 0) {
+          toggleWorkoutRestMode();
+          remainingTimes.restTime = restTime - 1;
+        } else {
+          remainingTimes.restTime -= 1;
+        }
+      }
+    }
 
-  function countdown(endTimePoint) {
-    const now = Date.now();
-    totalTime = Math.round((endTimePoint - now) / 1000);
+    function pauseTimer() {
+      if (timer) {
+        clearInterval(timer);
+        timer = null;
+      }
+    }
 
-    if (totalTime <= 0) {
-      clearInterval(timer);
-      timer = null;
-      totalTime = 0;
+    function stopTimer() {
+      pauseTimer();
       resetRenderMode();
+      remainingTimes = null;
+      calculateTotalTime();
+      renderTimeAt(totalTime, '#timer');
     }
 
-    console.log(remainingTimes);
-    countDownWorkoutRestTimers();
-    renderTimeAt(totalTime, '#timer');
-  }
+    function increaseWorkoutTime() {
+      adjustWorkoutTime(incrementTime);
+    }
 
-  function countDownWorkoutRestTimers() {
-    if (document.querySelector('#timer').classList.contains('workout')) {
-      if (remainingTimes.workoutTime - 1 < 0) {
-        toggleWorkoutRestMode();
-        remainingTimes.workoutTime = workoutTime - 1;
-      } else {
-        remainingTimes.workoutTime -= 1;
+    function decreaseWorkoutTime() {
+      adjustWorkoutTime(-incrementTime);
+    }
+
+    function adjustWorkoutTime(adjustmentInSeconds) {
+      let newTime = workoutTime + adjustmentInSeconds;
+      if (newTime < 0) {
+        newTime = 0
       }
-    } else if (document.querySelector('#timer').classList.contains('rest')) {
-      if (remainingTimes.restTime - 1 < 0) {
-        toggleWorkoutRestMode();
-        remainingTimes.restTime = restTime - 1;
-      } else {
-        remainingTimes.restTime -= 1;
+
+      workoutTime = newTime;
+      calculateTotalTime();
+      renderTimeAt(workoutTime, '#workout-time');
+      renderTimeAt(totalTime, '#timer');
+    }
+
+    function increaseRestTime() {
+      adjustRestTime(incrementTime);
+    }
+
+    function decreaseRestTime() {
+      adjustRestTime(-incrementTime);
+    }
+
+    function adjustRestTime(adjustmentInSeconds) {
+      let newTime = restTime + adjustmentInSeconds;
+      if (newTime < 0) {
+        newTime = 0
       }
-    }
-  }
 
-  function pauseTimer() {
-    if (timer) {
-      clearInterval(timer);
-      timer = null;
-    }
-  }
-
-  function stopTimer() {
-    pauseTimer();
-    resetRenderMode();
-    remainingTimes = null;
-    calculateTotalTime();
-    renderTimeAt(totalTime, '#timer');
-  }
-
-  function increaseWorkoutTime() {
-    adjustWorkoutTime(incrementTime);
-  }
-
-  function decreaseWorkoutTime() {
-    adjustWorkoutTime(-incrementTime);
-  }
-
-  function adjustWorkoutTime(adjustmentInSeconds) {
-    let newTime = workoutTime + adjustmentInSeconds;
-    if (newTime < 0) {
-      newTime = 0
+      restTime = newTime;
+      calculateTotalTime();
+      renderTimeAt(restTime, '#rest-time');
+      renderTimeAt(totalTime, '#timer');
     }
 
-    workoutTime = newTime;
-    calculateTotalTime();
-    renderTimeAt(workoutTime, '#workout-time');
-    renderTimeAt(totalTime, '#timer');
-  }
-
-  function increaseRestTime() {
-    adjustRestTime(incrementTime);
-  }
-
-  function decreaseRestTime() {
-    adjustRestTime(-incrementTime);
-  }
-
-  function adjustRestTime(adjustmentInSeconds) {
-    let newTime = restTime + adjustmentInSeconds;
-    if (newTime < 0) {
-      newTime = 0
+    function calculateTotalTime() {
+      const workoutTimePerRepetition = workoutsNumber * workoutTime;
+      const restTimePerRepetition = (workoutsNumber - 1) * restTime;
+      const restTimeBetweenRepetitions = (repetitionsNumber - 1) * restTime;
+      totalTime = repetitionsNumber * (workoutTimePerRepetition + restTimePerRepetition) + restTimeBetweenRepetitions;
     }
 
-    restTime = newTime;
-    calculateTotalTime();
-    renderTimeAt(restTime, '#rest-time');
-    renderTimeAt(totalTime, '#timer');
-  }
-
-  function calculateTotalTime() {
-    const workoutTimePerRepetition = workoutsNumber * workoutTime;
-    const restTimePerRepetition = ( workoutsNumber - 1 ) * restTime;
-    const restTimeBetweenRepetitions = (repetitionsNumber -1) * restTime;
-    totalTime = repetitionsNumber * (workoutTimePerRepetition + restTimePerRepetition) + restTimeBetweenRepetitions;
-  }
-
-  function increaseWorkoutsNumber() {
-    workoutsNumber += 1;
-    calculateTotalTime();
-    renderWorkoutsNumber(workoutsNumber);
-    renderTimeAt(totalTime, '#timer');
-  }
-
-  function decreaseWorkoutsNumber() {
-    let newWorkoutsNumber = workoutsNumber - 1;
-    if (newWorkoutsNumber < 0) {
-      newWorkoutsNumber = 0
+    function increaseWorkoutsNumber() {
+      workoutsNumber += 1;
+      calculateTotalTime();
+      renderWorkoutsNumber(workoutsNumber);
+      renderTimeAt(totalTime, '#timer');
     }
-    workoutsNumber = newWorkoutsNumber;
-    calculateTotalTime();
-    renderWorkoutsNumber(workoutsNumber);
-    renderTimeAt(totalTime, '#timer');
-  }
 
-  function increaseRepetitionsNumber() {
-    repetitionsNumber += 1;
-    calculateTotalTime();
-    renderRepetitionsNumber(repetitionsNumber);
-    renderTimeAt(totalTime, '#timer');
-  }
-
-  function decreaseRepetitionsNumber() {
-    let newRepetitionsNumber = repetitionsNumber - 1;
-    if (newRepetitionsNumber < 0) {
-      newRepetitionsNumber = 0
+    function decreaseWorkoutsNumber() {
+      let newWorkoutsNumber = workoutsNumber - 1;
+      if (newWorkoutsNumber < 0) {
+        newWorkoutsNumber = 0
+      }
+      workoutsNumber = newWorkoutsNumber;
+      calculateTotalTime();
+      renderWorkoutsNumber(workoutsNumber);
+      renderTimeAt(totalTime, '#timer');
     }
-    repetitionsNumber = newRepetitionsNumber;
-    calculateTotalTime();
-    renderRepetitionsNumber(repetitionsNumber);
-    renderTimeAt(totalTime, '#timer');
-  }
 
-  function renderTimeAt(timeInSeconds, selector) {
-    const {minutes, seconds} = getMinutesAndSecondsFromTotalSeconds(timeInSeconds);
-    document.querySelector(selector).innerHTML = stringifyMinutesAndSeconds(minutes, seconds);
-  }
+    function increaseRepetitionsNumber() {
+      repetitionsNumber += 1;
+      calculateTotalTime();
+      renderRepetitionsNumber(repetitionsNumber);
+      renderTimeAt(totalTime, '#timer');
+    }
 
-  function renderWorkoutMode() {
-    document.querySelector('#timer').classList.add('workout');
-  }
+    function decreaseRepetitionsNumber() {
+      let newRepetitionsNumber = repetitionsNumber - 1;
+      if (newRepetitionsNumber < 0) {
+        newRepetitionsNumber = 0
+      }
+      repetitionsNumber = newRepetitionsNumber;
+      calculateTotalTime();
+      renderRepetitionsNumber(repetitionsNumber);
+      renderTimeAt(totalTime, '#timer');
+    }
 
-  function toggleWorkoutRestMode() {
-    document.querySelector('#timer').classList.toggle('workout');
-    document.querySelector('#timer').classList.toggle('rest');
-  }
+    function renderTimeAt(timeInSeconds, selector) {
+      const {minutes, seconds} = getMinutesAndSecondsFromTotalSeconds(timeInSeconds);
+      document.querySelector(selector).innerHTML = stringifyMinutesAndSeconds(minutes, seconds);
+    }
 
-  function resetRenderMode() {
-    document.querySelector('#timer').classList.remove('workout');
-    document.querySelector('#timer').classList.remove('rest');
-  }
+    function renderWorkoutMode() {
+      document.querySelector('#timer').classList.add('workout');
+    }
 
-  function renderWorkoutsNumber(value) {
-    document.querySelector('#workouts-number').innerHTML = value.toString();
-  }
+    function toggleWorkoutRestMode() {
+      document.querySelector('#timer').classList.toggle('workout');
+      document.querySelector('#timer').classList.toggle('rest');
+    }
 
-  function renderRepetitionsNumber(value) {
-    document.querySelector('#repetitions-number').innerHTML = value.toString();
-  }
+    function resetRenderMode() {
+      document.querySelector('#timer').classList.remove('workout');
+      document.querySelector('#timer').classList.remove('rest');
+    }
 
-  function getMinutesAndSecondsFromTotalSeconds(totalSeconds) {
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = Math.ceil(totalSeconds % 60) % 60;
+    function renderWorkoutsNumber(value) {
+      document.querySelector('#workouts-number').innerHTML = value.toString();
+    }
 
-    return {minutes, seconds}
-  }
+    function renderRepetitionsNumber(value) {
+      document.querySelector('#repetitions-number').innerHTML = value.toString();
+    }
 
-  function stringifyMinutesAndSeconds(minutes, seconds) {
-    const minutesString = minutes < 10 ? '0' + minutes.toString() : minutes.toString();
-    const secondsString = seconds < 10 ? '0' + seconds.toString() : seconds.toString();
+    function getMinutesAndSecondsFromTotalSeconds(totalSeconds) {
+      const minutes = Math.floor(totalSeconds / 60);
+      const seconds = Math.ceil(totalSeconds % 60) % 60;
 
-    return minutesString + ':' + secondsString;
-  }
+      return {minutes, seconds}
+    }
 
-  function registerEvents() {
-    document.querySelector('#start-timer').addEventListener('click', startTimer);
-    document.querySelector('#pause-timer').addEventListener('click', pauseTimer);
-    document.querySelector('#stop-timer').addEventListener('click', stopTimer);
-    document.querySelector('#increase-workout-time').addEventListener('click', increaseWorkoutTime);
-    document.querySelector('#decrease-workout-time').addEventListener('click', decreaseWorkoutTime);
-    document.querySelector('#increase-rest-time').addEventListener('click', increaseRestTime);
-    document.querySelector('#decrease-rest-time').addEventListener('click', decreaseRestTime);
-    document.querySelector('#increase-workouts-number').addEventListener('click', increaseWorkoutsNumber);
-    document.querySelector('#decrease-workouts-number').addEventListener('click', decreaseWorkoutsNumber);
-    document.querySelector('#increase-repetitions-number').addEventListener('click', increaseRepetitionsNumber);
-    document.querySelector('#decrease-repetitions-number').addEventListener('click', decreaseRepetitionsNumber);
-  }
+    function stringifyMinutesAndSeconds(minutes, seconds) {
+      const minutesString = minutes < 10 ? '0' + minutes.toString() : minutes.toString();
+      const secondsString = seconds < 10 ? '0' + seconds.toString() : seconds.toString();
 
-  window.addEventListener('load', () => {
-    registerEvents();
-    renderTimeAt(defaultTotalTime, '#timer');
-    renderTimeAt(defaultWorkoutTime, '#workout-time');
-    renderTimeAt(defaultRestTime, '#rest-time');
-    renderWorkoutsNumber(defaultWorkoutsNumber);
-    renderRepetitionsNumber(defaultRepetitionsNumber);
-  });
+      return minutesString + ':' + secondsString;
+    }
+
+    function registerEvents() {
+      document.querySelector('#start-timer').addEventListener('click', startTimer);
+      document.querySelector('#pause-timer').addEventListener('click', pauseTimer);
+      document.querySelector('#stop-timer').addEventListener('click', stopTimer);
+      document.querySelector('#increase-workout-time').addEventListener('click', increaseWorkoutTime);
+      document.querySelector('#decrease-workout-time').addEventListener('click', decreaseWorkoutTime);
+      document.querySelector('#increase-rest-time').addEventListener('click', increaseRestTime);
+      document.querySelector('#decrease-rest-time').addEventListener('click', decreaseRestTime);
+      document.querySelector('#increase-workouts-number').addEventListener('click', increaseWorkoutsNumber);
+      document.querySelector('#decrease-workouts-number').addEventListener('click', decreaseWorkoutsNumber);
+      document.querySelector('#increase-repetitions-number').addEventListener('click', increaseRepetitionsNumber);
+      document.querySelector('#decrease-repetitions-number').addEventListener('click', decreaseRepetitionsNumber);
+    }
+
+    window.addEventListener('load', () => {
+      registerEvents();
+      renderTimeAt(defaultTotalTime, '#timer');
+      renderTimeAt(defaultWorkoutTime, '#workout-time');
+      renderTimeAt(defaultRestTime, '#rest-time');
+      renderWorkoutsNumber(defaultWorkoutsNumber);
+      renderRepetitionsNumber(defaultRepetitionsNumber);
+    });
+  })();
 </script>
 </body>
 </html>
