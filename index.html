@@ -257,7 +257,7 @@
         } else if (document.querySelector('#timer').classList.contains('rest')) {
           if (remainingTimes.restTime - 1 < 0) {
             toggleWorkoutRestMode();
-            playRestSound()
+            playWorkoutSound();
             remainingTimes.restTime = restTime - 1;
           } else {
             remainingTimes.restTime -= 1;
